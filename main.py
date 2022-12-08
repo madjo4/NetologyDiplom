@@ -70,7 +70,7 @@ def check_recommendation(user_id, partner_id):
         print("Подключен к SQLite")
 
         sql_select_query = """select * from recommendations where user_vk_id = ? and partner_vk_id = ?"""
-        cursor.execute(sql_select_query, (user_id,partner_id))
+        cursor.execute(sql_select_query, (user_id, partner_id))
         records = cursor.fetchall()
         if records:
             return 'Повтор'
@@ -136,7 +136,6 @@ class VKClient:
             print("В вашем профиле отсутствует информация как минимум по одному из параметров: возраст, пол, город или"
                   " семейное положение. Для работы с программой, пожалуйста, обновите ваш профиль и возвращайтесь.")
 
-
     def search_partners(self, search_params: list, sorting=0, count=1000):
         url = 'https://api.vk.com/method/users.search'
         global search_sex
@@ -163,7 +162,7 @@ class VKClient:
         # return response.json()
         partner_list = []
         for item in response.json()['response']['items']:
-            if item['is_closed'] == True:
+            if item['is_closed'] is True:
                 continue
             else:
                 partner_list.append(item['id'])
@@ -195,13 +194,14 @@ def write_msg(user_id, message):
 
 
 def write_question_msg(user_id, message, keyboard):
-    vk_bot.method('messages.send', {'user_id': user_id, 'message': message, 'keyboard': keyboard,  'random_id': random.randrange(10 ** 7)})
+    vk_bot.method('messages.send', {'user_id': user_id, 'message': message, 'keyboard': keyboard,
+                                    'random_id': random.randrange(10 ** 7)})
 
 
 def send_partner_photos(user_id, partner_id, photo_ids: list):
     for photo in photo_ids:
         vk_bot.method('messages.send', {'user_id': user_id, 'random_id': random.randrange(10 ** 7),
-        'attachment': f"photo{partner_id}_{photo}"})
+                                        'attachment': f"photo{partner_id}_{photo}"})
 
 
 vk_bot = vk_api.VkApi(token=group_token)
@@ -215,7 +215,7 @@ for event in longpoll.listen():
             request = event.text
             if request.lower() == "привет":
                 user_info = vk_client.get_user_info(event.user_id)
-                if user_info == None:
+                if user_info is None:
                     write_msg(event.user_id, f"Привет, пользователь! В вашем профиле отсутствует информация как "
                                              f"минимум по одному из параметров: возраст, пол, город или семейное "
                                              f"положение. Для работы с программой, пожалуйста, обновите ваш профиль "
@@ -239,8 +239,10 @@ for event in longpoll.listen():
                                         db_check = check_recommendation(event.user_id, partner_recommendation)
                                     insert_recommendation_into_table(event.user_id, partner_recommendation)
                                     partner_photos = vk_client.get_top3_photo(partner_recommendation)
-                                    write_msg(event.user_id, f"Хочешь познакомиться с https://vk.com/id{partner_recommendation} ?")
-                                    send_partner_photos(event.user_id, partner_id=partner_recommendation, photo_ids=partner_photos)
+                                    write_msg(event.user_id, f"Хочешь познакомиться с "
+                                                             f"https://vk.com/id{partner_recommendation} ?")
+                                    send_partner_photos(event.user_id, partner_id=partner_recommendation,
+                                                        photo_ids=partner_photos)
                                     keyboard2 = VkKeyboard(inline=True)
                                     keyboard2.add_button('Хочу другой вариант', color=VkKeyboardColor.PRIMARY)
                                     keyboard2.add_button('Спасибо. Достаточно', color=VkKeyboardColor.PRIMARY)
@@ -264,25 +266,31 @@ for event in longpoll.listen():
                                                                                      partner_recommendation)
                                                     partner_photos = vk_client.get_top3_photo(partner_recommendation)
                                                     write_msg(event.user_id,
-                                                              f"Хочешь познакомиться с https://vk.com/id{partner_recommendation} ?")
-                                                    send_partner_photos(event.user_id, partner_id=partner_recommendation,
+                                                              f"Хочешь познакомиться с "
+                                                              f"https://vk.com/id{partner_recommendation} ?")
+                                                    send_partner_photos(event.user_id,
+                                                                        partner_id=partner_recommendation,
                                                                         photo_ids=partner_photos)
                                                     write_question_msg(event.user_id, f"Достаточно или ищем ещё?",
                                                                        keyboard=keyboard2.get_keyboard())
                                                 elif request == "Спасибо. Достаточно":
-                                                    write_msg(event.user_id, "Отлично! Удачи. Для того, чтобы вернуться к поиску позже просто напишите 'привет'.")
+                                                    write_msg(event.user_id, "Отлично! Удачи. Для того, чтобы вернуться"
+                                                                             " к поиску позже просто напишите 'привет'")
                                                     break
                                                 else:
-                                                    write_msg(event.user_id, "Извините. Не вас понял. Для начала работы напишите, пожалуйста, 'привет' ещё раз.")
+                                                    write_msg(event.user_id, "Извините. Не вас понял. Для начала "
+                                                                             "работы напишите, пожалуйста, 'привет' "
+                                                                             "ещё раз.")
                                                     break
                                 elif request == 'Не нужно. Спасибо':
                                     write_msg(event.user_id, "ОК. Если что, обращайся :)")
                                     break
                                 elif request.lower() == "привет":
-                                    write_msg(event.user_id, "Для начала работы напишите, пожалуйста, 'привет' ещё раз.")
+                                    write_msg(event.user_id, "Для начала работы напишите, пожалуйста, 'привет' ещё раз")
                                     break
                                 else:
-                                    write_msg(event.user_id, "Извините. Не вас понял. Для начала работы напишите, пожалуйста, 'привет' ещё раз.")
+                                    write_msg(event.user_id, "Извините. Не вас понял. Для начала работы напишите, "
+                                                             "пожалуйста, 'привет' ещё раз.")
                                     break
             else:
                 write_msg(event.user_id, "Извините. Я вас не понял. Для начала общения со мной напишите 'привет'")
