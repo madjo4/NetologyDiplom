@@ -286,15 +286,3 @@ for event in longpoll.listen():
                                     break
             else:
                 write_msg(event.user_id, "Извините. Я вас не понял. Для начала общения со мной напишите 'привет'")
-#
-# user1 = vk_client.get_user_info(5485627)
-# print(user1)
-# options = vk_client.search_partners(user1)
-# print(options)
-
-# insert_recommendation_into_table(20184634, 5485627)
-# insert_recommendation_into_table(20184634, 814620)
-# insert_recommendation_into_table(20184634, 1456321)
-# # read_sqlite_table()
-# # get_user_info(20184634)
-# check_recommendation(20184634, 1456320)
